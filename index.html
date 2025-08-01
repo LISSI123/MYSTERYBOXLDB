@@ -6,6 +6,45 @@
   <title>MYSTERY BOX KEMERDEKAAN RI KE-80</title>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap" rel="stylesheet">
   <style>
+    /* ====== PERFORMA OPTIMALISASI GLOBAL ====== */
+    * {
+      box-sizing: border-box;
+    }
+    html {
+      /* Smooth scrolling dan optimalisasi rendering */
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+    }
+    body {
+      /* Hardware acceleration untuk animasi yang lebih smooth */
+      transform: translateZ(0);
+      backface-visibility: hidden;
+      perspective: 1000px;
+      /* Reduce paint dan layout thrashing */
+      will-change: transform;
+    }
+    /* Optimalisasi untuk elemen yang sering berubah */
+    .box, .btn-main, .btn-show-history, .prize-list-btn, .win-popup, .modal {
+      /* Hardware acceleration */
+      transform: translateZ(0);
+      backface-visibility: hidden;
+      /* Isolate paint layers */
+      contain: layout style paint;
+      /* Reduce repaints */
+      will-change: transform, opacity;
+    }
+    /* Reduce animation cost */
+    .particle, .flag-particle, .shine, .burst {
+      /* Hardware acceleration untuk particles */
+      transform: translateZ(0);
+      backface-visibility: hidden;
+      /* Isolate animations */
+      contain: strict;
+      will-change: transform, opacity;
+    }
+    
     :root {
       --emerald: #ff0000;
       --gold: #ffd700;
@@ -49,28 +88,60 @@
         /* Subtle Indonesian texture overlay */
         url("data:image/svg+xml,%3Csvg width='150' height='150' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='indonesia' x='0' y='0' width='6' height='6' patternUnits='userSpaceOnUse'%3E%3Ccircle cx='3' cy='3' r='1' fill='%23ff0000' opacity='0.05'/%3E%3Crect x='1' y='1' width='4' height='2' fill='%23ffffff' opacity='0.03'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='150' height='150' fill='url(%23indonesia)'/%3E%3C/svg%3E");
       opacity: 0.9;
-      animation: indonesianBreathing 20s ease-in-out infinite, kemerdekaan80 30s linear infinite;
+      /* Optimalisasi animasi untuk performa lebih baik */
+      animation: indonesianBreathing 25s ease-in-out infinite, kemerdekaan80 35s linear infinite;
+      /* Hardware acceleration */
+      transform: translateZ(0);
+      will-change: opacity, transform, background-position;
     }
     
+    /* ====== OPTIMALISASI ANIMASI UNTUK PERFORMA ====== */
     /* Epic Indonesian Independence Animations */
     @keyframes indonesianBreathing {
-      0%, 100% { opacity: 0.9; transform: scale(1); }
-      50% { opacity: 1; transform: scale(1.02); }
+      0%, 100% { 
+        opacity: 0.9; 
+        transform: translateZ(0) scale(1); 
+      }
+      50% { 
+        opacity: 1; 
+        transform: translateZ(0) scale(1.01); 
+      }
     }
     
     @keyframes kemerdekaan80 {
-      0% { background-position: 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%; }
-      25% { background-position: 25% 25%, 15% 15%, 35% 5%, 45% 25%, 20% 10%; }
-      50% { background-position: 50% 50%, 30% 30%, 70% 10%, 90% 50%, 40% 20%; }
-      75% { background-position: 75% 25%, 45% 15%, 105% 5%, 135% 25%, 60% 10%; }
-      100% { background-position: 100% 0%, 60% 0%, 140% 0%, 180% 0%, 80% 0%; }
+      0% { 
+        background-position: 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%; 
+      }
+      25% { 
+        background-position: 25% 25%, 15% 15%, 35% 5%, 45% 25%, 20% 10%; 
+      }
+      50% { 
+        background-position: 50% 50%, 30% 30%, 70% 10%, 90% 50%, 40% 20%; 
+      }
+      75% { 
+        background-position: 75% 25%, 45% 15%, 105% 5%, 135% 25%, 60% 10%; 
+      }
+      100% { 
+        background-position: 100% 0%, 60% 0%, 140% 0%, 180% 0%, 80% 0%; 
+      }
     }
     
     @keyframes cinematicBreathing {
-      0%, 100% { opacity: 0.8; transform: scale(1); }
-      33% { opacity: 0.9; transform: scale(1.01); }
-      66% { opacity: 0.7; transform: scale(0.99); }
+      0%, 100% { 
+        opacity: 0.8; 
+        transform: translateZ(0) scale(1); 
+      }
+      33% { 
+        opacity: 0.9; 
+        transform: translateZ(0) scale(1.005); 
+      }
+      66% { 
+        opacity: 0.7; 
+        transform: translateZ(0) scale(0.995); 
+      }
     }
+    
+    /* ====== PARTICLES OPTIMALISASI ====== */
     /* Subtle floating particles */
     .particle {
       position: fixed;
@@ -78,12 +149,28 @@
       pointer-events: none;
       opacity: 0.13;
       z-index: 1;
-      animation: float 14s linear infinite;
+      /* Animasi yang lebih smooth dan ringan */
+      animation: floatOptimized 16s linear infinite;
       background: radial-gradient(circle, #fffbe6 0%, #ffd700 60%, transparent 100%);
+      /* Hardware acceleration */
+      transform: translateZ(0);
+      will-change: transform, opacity;
     }
-    @keyframes float {
-      0% { transform: translateY(0) scale(1);}
-      100% { transform: translateY(-100vh) scale(1.2);}
+    @keyframes floatOptimized {
+      0% { 
+        transform: translateZ(0) translateY(0) scale(1);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.13;
+      }
+      90% {
+        opacity: 0.13;
+      }
+      100% { 
+        transform: translateZ(0) translateY(-100vh) scale(1.1);
+        opacity: 0;
+      }
     }
     /* Indonesian flag particles with enhanced animation */
     .flag-particle {
@@ -91,15 +178,29 @@
       pointer-events: none;
       opacity: 0.25;
       z-index: 1;
-      animation: flagFloat 15s linear infinite;
+      /* Animasi yang lebih smooth */
+      animation: flagFloatOptimized 18s linear infinite;
       box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
       border-radius: 3px;
+      /* Hardware acceleration */
+      transform: translateZ(0);
+      will-change: transform, opacity;
     }
-    @keyframes flagFloat {
-      0% { transform: translateY(100vh) rotate(0deg) scale(0.8); opacity: 0; }
-      10% { opacity: 0.25; }
-      90% { opacity: 0.25; }
-      100% { transform: translateY(-10vh) rotate(360deg) scale(1.2); opacity: 0; }
+    @keyframes flagFloatOptimized {
+      0% { 
+        transform: translateZ(0) translateY(100vh) rotate(0deg) scale(0.8); 
+        opacity: 0; 
+      }
+      15% { 
+        opacity: 0.25; 
+      }
+      85% { 
+        opacity: 0.25; 
+      }
+      100% { 
+        transform: translateZ(0) translateY(-10vh) rotate(180deg) scale(1.1); 
+        opacity: 0; 
+      }
     }
     /* Enhanced Indonesian Independence particles with cinematic drama */
     .independence-sparkle {
@@ -386,25 +487,62 @@
     .box.opened .mystery-icon { display: none; }
     .box:hover:not(.disabled):not(.opened) {
       box-shadow: 0 0 24px 6px #ffd70044, 0 0 12px 2px #ff000044;
-      transform: scale(1.05);
+      transform: translateZ(0) scale(1.05);
       filter: brightness(1.07);
+      /* Smooth transition yang lebih optimal */
+      transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, filter 0.2s ease-out;
     }
     .box.opened {
-      animation: boxBurst .6s cubic-bezier(.4,2,.3,1);
+      animation: boxBurstOptimized .5s ease-out;
       box-shadow: 0 0 32px 10px #ffd70044, 0 0 16px 4px #ff000044;
       border-color: #ffd700;
       filter: brightness(1.13);
       z-index: 10;
+      /* Hardware acceleration */
+      transform: translateZ(0);
     }
-    @keyframes boxBurst {
-      0% { transform: scale(1); box-shadow: 0 0 12px 2px #ffd70044;}
-      60% { transform: scale(1.12); box-shadow: 0 0 32px 10px #ffd70044;}
-      100% { transform: scale(1.05); box-shadow: 0 0 24px 6px #ffd70044;}
+    @keyframes boxBurstOptimized {
+      0% { 
+        transform: translateZ(0) scale(1); 
+        box-shadow: 0 0 12px 2px #ffd70044;
+      }
+      50% { 
+        transform: translateZ(0) scale(1.08); 
+        box-shadow: 0 0 32px 10px #ffd70044;
+      }
+      100% { 
+        transform: translateZ(0) scale(1.05); 
+        box-shadow: 0 0 24px 6px #ffd70044;
+      }
     }
     .box.disabled {
       pointer-events: none;
       opacity: 0.5;
       filter: grayscale(0.5) blur(1px);
+    }
+    
+    /* ====== PRIZE AMOUNT TEXT STYLING ====== */
+    .box .prize-amount-text {
+      margin-top: 2px;
+      text-align: center;
+      line-height: 1.1;
+      word-wrap: break-word;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      max-width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 18px;
+      padding: 2px;
+    }
+    .box .prize-amount-text span {
+      display: block;
+      width: 100%;
+      text-align: center;
+      line-height: 1.1;
+      word-break: break-word;
+      overflow-wrap: break-word;
     }
     .box.selected {
       border: 4px solid #ff0000;
@@ -678,16 +816,20 @@
       border: none;
       box-shadow: 0 0 12px 2px #0066ff44;
       cursor: pointer;
-      transition: box-shadow .18s, transform .18s;
+      /* Transition yang lebih smooth dan optimal */
+      transition: box-shadow 0.15s ease-out, transform 0.15s ease-out, color 0.15s ease-out;
       outline: none;
       text-shadow: 0 0 2px #ffd700;
       display: none;
+      /* Hardware acceleration */
+      transform: translateZ(0);
+      will-change: transform, box-shadow;
     }
     .btn-show-history.active { display: block; }
     .btn-show-history:hover {
       box-shadow: 0 0 24px 6px #ffd70044, 0 0 8px 2px #0066ff44;
       color: #ffd700;
-      transform: scale(1.03);
+      transform: translateZ(0) scale(1.03);
     }
     /* Epic Indonesian Floating Symbols */
     .floating-symbols {
@@ -848,20 +990,49 @@
         text-shadow: 0 0 8px #ff000044;
       }
       .grid {
-        --box-size: min(65px, 26vw);
-        gap: 2.5vw;
+        --box-size: min(75px, 30vw);
+        gap: 1.8vw;
         margin-bottom: 12px;
         justify-content: center;
+        max-width: 100%;
+        padding: 0 2vw;
       }
       .box {
-        font-size: 1.1rem;
+        font-size: 0.9rem;
         border-radius: 10px;
         touch-action: manipulation;
         -webkit-tap-highlight-color: transparent;
-        transition: all .3s cubic-bezier(.4,2,.3,1);
+        /* Transition yang lebih smooth untuk mobile */
+        transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+        min-height: var(--box-size);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 2px;
+        /* Hardware acceleration */
+        transform: translateZ(0);
+        will-change: transform;
+      }
+      .box .prize-amount-text {
+        font-size: 0.9rem !important;
+        line-height: 1.1;
+        text-align: center;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        max-width: 100%;
+        padding: 1px;
+      }
+      .box .prize-amount-text span {
+        font-size: 0.9rem !important;
+        display: block;
+        max-width: 100%;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        line-height: 1.1;
       }
       .box:active {
-        transform: scale(0.95);
+        transform: translateZ(0) scale(0.95);
       }
       .corner-icons {
         top: 10px;
@@ -874,11 +1045,15 @@
         border-radius: 12px;
         touch-action: manipulation;
         -webkit-tap-highlight-color: transparent;
-        transition: all .3s cubic-bezier(.4,2,.3,1);
+        /* Transition yang lebih smooth untuk mobile buttons */
+        transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
+        /* Hardware acceleration */
+        transform: translateZ(0);
+        will-change: transform;
       }
       .btn-main:active, .btn-show-history:active, .prize-list-btn:active, 
       .btn-close-modal:active, .btn-close-history:active {
-        transform: scale(0.98);
+        transform: translateZ(0) scale(0.98);
       }
       .win-popup .prize-icon {
         width: 45px;
@@ -939,13 +1114,32 @@
         margin-bottom: 16px;
       }
       .grid {
-        --box-size: min(48px, 24vw);
-        gap: 1.5vw;
+        --box-size: min(65px, 28vw);
+        gap: 1.2vw;
         margin-bottom: 8px;
+        padding: 0 1vw;
       }
       .box {
-        font-size: 0.95rem;
+        font-size: 0.8rem;
         border-radius: 8px;
+        padding: 1px;
+        min-height: var(--box-size);
+      }
+      .box .prize-amount-text {
+        font-size: 0.8rem !important;
+        line-height: 1;
+        text-align: center;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        padding: 1px;
+      }
+      .box .prize-amount-text span {
+        font-size: 0.8rem !important;
+        display: block;
+        max-width: 100%;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        line-height: 1;
       }
       .corner-icons {
         top: 4px;
@@ -981,10 +1175,14 @@
         margin-top: 4px;
         touch-action: manipulation;
         -webkit-tap-highlight-color: transparent;
-        transition: all .3s cubic-bezier(.4,2,.3,1);
+        /* Transition yang lebih smooth */
+        transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
+        /* Hardware acceleration */
+        transform: translateZ(0);
+        will-change: transform;
       }
       .btn-claim:active {
-        transform: scale(0.98);
+        transform: translateZ(0) scale(0.98);
       }
       .modal-table th, .modal-table td {
         font-size: 0.85rem;
@@ -1016,12 +1214,28 @@
         margin: 0.5vw;
       }
       .grid {
-        --box-size: min(42px, 22vw);
-        gap: 1vw;
+        --box-size: min(60px, 26vw);
+        gap: 0.8vw;
+        padding: 0 0.5vw;
       }
       .box {
-        font-size: 0.85rem;
+        font-size: 0.7rem;
         border-radius: 6px;
+        padding: 1px;
+        min-height: var(--box-size);
+      }
+      .box .prize-amount-text {
+        font-size: 0.7rem !important;
+        line-height: 1;
+        padding: 1px;
+      }
+      .box .prize-amount-text span {
+        font-size: 0.7rem !important;
+        display: block;
+        max-width: 100%;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        line-height: 1;
       }
       .btn-main, .btn-show-history, .prize-list-btn, .btn-close-modal, .btn-close-history {
         font-size: 0.85rem;
@@ -1042,13 +1256,61 @@
         margin-bottom: 8px;
       }
       .grid {
-        --box-size: min(38px, 18vw);
-        gap: 1vw;
+        --box-size: min(45px, 20vw);
+        gap: 0.8vw;
         margin-bottom: 4px;
+        padding: 0 1vw;
+      }
+      .box {
+        min-height: var(--box-size);
+        padding: 1px;
+      }
+      .box .prize-amount-text {
+        font-size: 0.75rem !important;
+        line-height: 1;
+        padding: 1px;
+      }
+      .box .prize-amount-text span {
+        font-size: 0.75rem !important;
+        display: block;
+        max-width: 100%;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        line-height: 1;
       }
       .win-popup {
         max-height: 80vh;
         overflow-y: auto;
+      }
+    }
+    
+    /* ====== ACCESSIBILITY & PERFORMANCE ====== */
+    /* Reduce motion untuk users yang sensitif terhadap animasi */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+      .particle, .flag-particle, .independence-sparkle {
+        display: none !important;
+      }
+      body::before {
+        animation: none !important;
+      }
+    }
+    
+    /* Optimize untuk device dengan memory terbatas */
+    @media (max-width: 320px), (max-height: 500px) {
+      /* Kurangi kompleksitas animasi */
+      .particle, .flag-particle {
+        display: none;
+      }
+      body::before {
+        background: 
+          radial-gradient(ellipse at center, transparent 0%, transparent 30%, rgba(255,0,0,0.1) 60%, rgba(0,0,0,0.4) 100%);
+        animation: none;
       }
     }
   </style>
@@ -1420,6 +1682,33 @@
       <circle cx="8" cy="32" r="1.5" fill="#ffd700" opacity="0.8"/>
       <circle cx="36" cy="32" r="1.5" fill="#ffd700" opacity="0.8"/>
     </svg>`;
+    
+    // Format angka yang responsive untuk mobile
+    function formatPrize(amount) {
+      if (window.innerWidth <= 360) {
+        // Format super compact untuk mobile tiny: 8K, 7K, etc
+        if (amount >= 1000) {
+          return (amount/1000) + 'K';
+        }
+        return amount.toString();
+      } else if (window.innerWidth <= 480) {
+        // Format compact untuk mobile kecil: 8K, 7K, etc
+        if (amount >= 1000) {
+          return (amount/1000) + 'K';
+        }
+        return amount.toString();
+      } else if (window.innerWidth <= 768) {
+        // Format medium untuk tablet: 8K atau 8.000
+        if (amount >= 1000) {
+          return (amount/1000) + 'K';
+        }
+        return amount.toLocaleString('id-ID');
+      } else {
+        // Format full untuk desktop: Rp 8.000
+        return 'Rp ' + amount.toLocaleString('id-ID');
+      }
+    }
+    
     // Step 1: Form
     const formPanel = document.getElementById('formPanel');
     const gamePanel = document.getElementById('gamePanel');
@@ -1601,7 +1890,7 @@ function openBox(box, idx){
     box.tabIndex = -1;
     box.querySelector('.prize-icon').innerHTML = shuffledPrizes[idx].icon;
     box.querySelector('.mystery-icon').innerHTML = mysteryIcon;
-    box.querySelector('.prize-amount-text').innerHTML = `<span style='font-size:1.35rem;font-weight:900;color:#fffbe6;text-shadow:0 0 10px #ffd700,0 0 4px #0066ff;'>Rp ${shuffledPrizes[idx].amount.toLocaleString('id-ID')}</span>`;
+    box.querySelector('.prize-amount-text').innerHTML = `<span style='font-size:1.1rem;font-weight:900;color:#fffbe6;text-shadow:0 0 10px #ffd700,0 0 4px #0066ff;display:block;text-align:center;'>${formatPrize(shuffledPrizes[idx].amount)}</span>`;
     
     console.log('HADIAH YANG DITAMPILKAN DI GAME:', shuffledPrizes[idx].amount);
     console.log('HADIAH YANG DIKIRIM KE SHEET TADI:', window.hadiahPasti.amount);
@@ -1624,10 +1913,10 @@ function openBox(box, idx){
             b.tabIndex = -1;
             if(shuffledPrizes[i]){
               b.querySelector('.prize-icon').innerHTML = shuffledPrizes[i].icon;
-              b.querySelector('.prize-amount-text').innerHTML = `<span style='font-size:1.15rem;font-weight:900;color:#fffbe6;text-shadow:0 0 8px #ffd700,0 0 2px #0066ff;'>Rp ${shuffledPrizes[i].amount.toLocaleString('id-ID')}</span>`;
+              b.querySelector('.prize-amount-text').innerHTML = `<span style='font-size:1rem;font-weight:900;color:#fffbe6;text-shadow:0 0 8px #ffd700,0 0 2px #0066ff;display:block;text-align:center;'>${formatPrize(shuffledPrizes[i].amount)}</span>`;
             }else{
               b.querySelector('.prize-icon').innerHTML = zonkIcon;
-              b.querySelector('.prize-amount-text').innerHTML = `<span style='font-size:1.15rem;font-weight:900;color:#ffd700,text-shadow:0 0 8px #ffd700,0 0 2px #232a3a;'>ZONK</span>`;
+              b.querySelector('.prize-amount-text').innerHTML = `<span style='font-size:1rem;font-weight:900;color:#ffd700;text-shadow:0 0 8px #ffd700,0 0 2px #232a3a;display:block;text-align:center;'>ZONK</span>`;
             }
             b.querySelector('.mystery-icon').innerHTML = mysteryIcon;
             b.classList.remove('selected');
