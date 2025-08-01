@@ -1449,18 +1449,35 @@
       // Reset state agar grid bisa diklik setelah submit baru
       boxClicked = false;
       lastResult = null;
-      // Hadiah aktual yang benar-benar akan dikirim (3K-8K saja)
-      const hadiahUtamaResult = hadiahAktual[Math.floor(Math.random() * hadiahAktual.length)];
-      window.hadiahUtamaResult = hadiahUtamaResult; // simpan global
       
+      // TENTUKAN HADIAH YANG PASTI AKAN KELUAR (3K-8K saja)
+      const hadiahPasti = hadiahAktual[Math.floor(Math.random() * hadiahAktual.length)];
+      window.hadiahPasti = hadiahPasti; // SIMPAN HADIAH YANG PASTI KELUAR
+      
+      console.log('HADIAH YANG AKAN KELUAR DAN DIKIRIM KE SHEET:', hadiahPasti.amount, hadiahPasti.label);
+      
+      // LANGSUNG KIRIM KE GOOGLE SHEET SEKARANG
+      const hadiahValue = hadiahPasti.amount.toString(); // Pastikan string
+      const timestamp = Date.now(); // Anti-cache
       const url = 'https://script.google.com/macros/s/AKfycby09nNAoOJyw14nSkWLmCZD9afpd1lzqkMuegD_B85wSSZzeG0rT9G5sA-tRJhQtzi_BA/exec'
         + '?userId=' + encodeURIComponent(userId)
         + '&kupon=' + encodeURIComponent(kupon)
-        + '&hadiah=' + encodeURIComponent(hadiahUtamaResult.amount);
+        + '&hadiah=' + hadiahValue
+        + '&t=' + timestamp; // Anti-cache parameter
+
+      console.log('===== DEBUG GOOGLE SHEET =====');
+      console.log('URL LENGKAP:', url);
+      console.log('HADIAH YANG AKAN DIKIRIM:', hadiahValue);
+      console.log('TIMESTAMP ANTI-CACHE:', timestamp);
+
+      // Test dengan fetch manual
+      const testUrl = url;
+      console.log('TESTING URL MANUAL:', testUrl);
 
       try {
         const res = await fetch(url);
         const text = await res.text();
+        console.log('GOOGLE SHEET RESPONSE:', text);
 
         if (text.includes("Selamat")) {
           formPanel.style.display = 'none';
@@ -1486,8 +1503,16 @@
     const zonkIcon = `<svg class="prize-icon" viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" fill="#232a3a" stroke="#ffd700" stroke-width="2"/><ellipse cx="15" cy="18" rx="3" ry="4" fill="#fff"/><ellipse cx="29" cy="18" rx="3" ry="4" fill="#fff"/><circle cx="15" cy="19" r="1.2" fill="#232a3a"/><circle cx="29" cy="19" r="1.2" fill="#232a3a"/><path d="M16 28 Q22 34 28 28" stroke="#fff" stroke-width="2" fill="none"/><rect x="18" y="34" width="8" height="4" rx="2" fill="#ffd700"/></svg>`;
     function renderGrid(){
       boxGrid.innerHTML = '';
-      // Hadiah utama: gunakan hasil submit (sinkron dengan Google Sheet)
-      const hadiahUtama = window.hadiahUtamaResult;
+      // Hadiah utama: gunakan hasil yang SAMA dengan yang dikirim ke Google Sheet
+      const hadiahUtama = window.hadiahPasti;
+      
+      if (!hadiahUtama) {
+        console.error("ERROR: hadiahPasti tidak ditemukan!");
+        alert("Error: Hadiah tidak ditemukan. Silakan refresh dan coba lagi.");
+        return;
+      }
+      
+      console.log("renderGrid: hadiah utama yang akan ditampilkan:", hadiahUtama.amount, hadiahUtama.label);
       
       // Hadiah lain: gunakan daftar lengkap untuk tampilan (tapi yang menang tetap dari hadiahAktual)
       let hadiahLain = daftarHadiah.filter(h => h.amount !== hadiahUtama.amount);
@@ -1501,14 +1526,23 @@
         const j = Math.floor(Math.random() * (i + 1));
         [posisiAcak[i], posisiAcak[j]] = [posisiAcak[j], posisiAcak[i]];
       }
-      // shuffledPrizes: hadiah utama di posisi yang akan dipilih user (nanti di openBox), hadiah lain di posisi lain
+      // shuffledPrizes: hadiah utama di posisi acak, hadiah lain di posisi lain
       shuffledPrizes = Array(9).fill(null);
+      
+      // Tentukan posisi acak untuk hadiah utama
+      const posisiHadiahUtama = Math.floor(Math.random() * 9);
+      shuffledPrizes[posisiHadiahUtama] = hadiahUtama;
+      
+      // Isi posisi lain dengan hadiah lain
       let idxLain = 0;
       for (let i = 0; i < 9; i++) {
-        shuffledPrizes[posisiAcak[i]] = idxLain < 8 ? hadiahLain[idxLain] : null;
+        if (i === posisiHadiahUtama) continue; // Skip posisi hadiah utama
+        shuffledPrizes[i] = hadiahLain[idxLain % hadiahLain.length];
         idxLain++;
       }
-      shuffledPrizes.hadiahUtama = hadiahUtama;
+      
+      console.log("shuffledPrizes setelah diatur:", shuffledPrizes.map(p => p ? p.amount : 'null'));
+      console.log("Hadiah utama ada di posisi:", posisiHadiahUtama, "dengan nilai:", hadiahUtama.amount);
 for(let i=0;i<9;i++){
         const box = document.createElement('div');
         box.className = 'box';
@@ -1527,8 +1561,13 @@ function openBox(box, idx){
   if(boxClicked) return;
   boxClicked = true;
   
-  // Hadiah utama SELALU di box yang dipilih (sudah sesuai dengan Google Sheet)
-  shuffledPrizes[idx] = shuffledPrizes.hadiahUtama;
+  // Hadiah utama SELALU menang - ganti box yang diklik dengan hadiah utama
+  const hadiahUtama = window.hadiahPasti;
+  console.log("openBox: User klik box", idx, "hadiah asli:", shuffledPrizes[idx]?.amount);
+  console.log("openBox: Hadiah akan diganti dengan hadiah utama:", hadiahUtama.amount);
+  
+  // Pastikan user selalu menang hadiah utama
+  shuffledPrizes[idx] = hadiahUtama;
   
   // Animate shine
   const shine = document.createElement('div');
@@ -1561,6 +1600,11 @@ function openBox(box, idx){
     box.querySelector('.prize-icon').innerHTML = shuffledPrizes[idx].icon;
     box.querySelector('.mystery-icon').innerHTML = mysteryIcon;
     box.querySelector('.prize-amount-text').innerHTML = `<span style='font-size:1.35rem;font-weight:900;color:#fffbe6;text-shadow:0 0 10px #ffd700,0 0 4px #0066ff;'>Rp ${shuffledPrizes[idx].amount.toLocaleString('id-ID')}</span>`;
+    
+    console.log('HADIAH YANG DITAMPILKAN DI GAME:', shuffledPrizes[idx].amount);
+    console.log('HADIAH YANG DIKIRIM KE SHEET TADI:', window.hadiahPasti.amount);
+    console.log('APAKAH SAMA?', shuffledPrizes[idx].amount === window.hadiahPasti.amount ? 'YA' : 'TIDAK SAMA ANJING!');
+    
     // Animasi buka box lain satu per satu
     const allBoxes = Array.from(document.querySelectorAll('.box'));
     let delay = 0;
@@ -1610,6 +1654,9 @@ function openBox(box, idx){
     }
     // Box yang diklik tetap menampilkan hadiah utama di win popup
     setTimeout(()=>{
+      // Tidak perlu kirim lagi karena sudah dikirim saat submit form
+      console.log("openBox: Menampilkan hadiah yang sudah dikirim ke Google Sheet:", shuffledPrizes[idx]);
+      
       showWinPopup(shuffledPrizes[idx]);
       btnShowHistory.classList.add('active');
       lastResult = shuffledPrizes[idx];
@@ -1618,6 +1665,7 @@ function openBox(box, idx){
 }
                   // Show win popup (Independence theme)
     function showWinPopup(prize){
+      console.log('showWinPopup: HADIAH YANG AKAN DITAMPILKAN DI POPUP:', prize.amount);
       winPrizeText.textContent = `Hadiah Kemerdekaan: Rp ${prize.amount.toLocaleString('id-ID')}`;
       winTitle.innerHTML = `🇮🇩 DIRGAHAYU RI KE-80! 🎁`;
       winPopup.style.display = 'flex';
