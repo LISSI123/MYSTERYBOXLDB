@@ -1531,7 +1531,8 @@
       
       // Tentukan posisi acak untuk hadiah utama
       const posisiHadiahUtama = Math.floor(Math.random() * 9);
-      shuffledPrizes[posisiHadiahUtama] = hadiahUtama;
+      // PASTIKAN hadiah utama menggunakan nilai YANG SAMA dengan yang dikirim ke Google Sheet
+      shuffledPrizes[posisiHadiahUtama] = window.hadiahPasti;
       
       // Isi posisi lain dengan hadiah lain
       let idxLain = 0;
@@ -1542,7 +1543,8 @@
       }
       
       console.log("shuffledPrizes setelah diatur:", shuffledPrizes.map(p => p ? p.amount : 'null'));
-      console.log("Hadiah utama ada di posisi:", posisiHadiahUtama, "dengan nilai:", hadiahUtama.amount);
+      console.log("Hadiah utama ada di posisi:", posisiHadiahUtama, "dengan nilai:", window.hadiahPasti.amount);
+      console.log("KONSISTENSI CHECK - window.hadiahPasti.amount:", window.hadiahPasti.amount);
 for(let i=0;i<9;i++){
         const box = document.createElement('div');
         box.className = 'box';
@@ -1566,8 +1568,8 @@ function openBox(box, idx){
   console.log("openBox: User klik box", idx, "hadiah asli:", shuffledPrizes[idx]?.amount);
   console.log("openBox: Hadiah akan diganti dengan hadiah utama:", hadiahUtama.amount);
   
-  // Pastikan user selalu menang hadiah utama
-  shuffledPrizes[idx] = hadiahUtama;
+  // Pastikan user selalu menang hadiah utama YANG SAMA dengan yang dikirim ke Google Sheet
+  shuffledPrizes[idx] = window.hadiahPasti;
   
   // Animate shine
   const shine = document.createElement('div');
@@ -1603,7 +1605,10 @@ function openBox(box, idx){
     
     console.log('HADIAH YANG DITAMPILKAN DI GAME:', shuffledPrizes[idx].amount);
     console.log('HADIAH YANG DIKIRIM KE SHEET TADI:', window.hadiahPasti.amount);
-    console.log('APAKAH SAMA?', shuffledPrizes[idx].amount === window.hadiahPasti.amount ? 'YA' : 'TIDAK SAMA ANJING!');
+    console.log('APAKAH SAMA?', shuffledPrizes[idx].amount === window.hadiahPasti.amount ? 'YA - BENAR!' : 'TIDAK SAMA - ADA BUG!');
+    console.log('=== FINAL CHECK: HADIAH GAME vs SHEET ===');
+    console.log('GAME:', shuffledPrizes[idx].amount);
+    console.log('SHEET:', window.hadiahPasti.amount);
     
     // Animasi buka box lain satu per satu
     const allBoxes = Array.from(document.querySelectorAll('.box'));
